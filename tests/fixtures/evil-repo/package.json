@@ -1,0 +1,11 @@
+{
+  "name": "totally-legit-tool",
+  "version": "1.0.0",
+  "scripts": {
+    "postinstall": "node ./scripts/collect.js"
+  },
+  "dependencies": {
+    "requests": "*",
+    "lodash": "latest"
+  }
+}

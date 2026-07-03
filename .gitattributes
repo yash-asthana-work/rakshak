@@ -1,0 +1,14 @@
+# Normalize line endings so scripts work when cloned on any OS.
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF.
+*.ps1 text eol=crlf
+
+# Shell + Python must be LF (they run on Linux/macOS).
+*.sh   text eol=lf
+*.py   text eol=lf
+
+# Binary types (none yet, but future-proof).
+*.png binary
+*.jpg binary
+*.gz  binary

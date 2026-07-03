@@ -1,0 +1,37 @@
+{
+  "//": "Layer-0 OS containment for reviewing untrusted code. Works for BOTH Claude Code and GitHub Copilot (both can run inside a dev container). This is the only layer that survives a full injection compromise. Open the UNTRUSTED repo in this container (VS Code: 'Reopen in Container'), or `devcontainer up`. See devcontainer/README.md.",
+
+  "name": "untrusted-code-triage-sandbox",
+  "image": "mcr.microsoft.com/devcontainers/base:debian",
+
+  "//runArgs": "Non-root, no new privileges, dropped capabilities, tmpfs workspace. Uncomment the network line ONLY when you will not run the AI tool inside the container (it needs egress to the LLM API); if the tool runs on the host and only the code lives here, --network=none is ideal.",
+  "runArgs": [
+    "--security-opt", "no-new-privileges",
+    "--cap-drop", "ALL",
+    "--pids-limit", "512"
+    // , "--network=none"   // enable for zero-egress when the AI tool is NOT inside the container
+  ],
+
+  "containerUser": "vscode",
+  "updateRemoteUserUID": true,
+
+  "//mounts": "Repo is bind-mounted READ-ONLY. No host credential dirs (~/.ssh, ~/.aws, ~/.npmrc) are mounted. Do NOT add host credential mounts.",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,readonly",
+  "workspaceFolder": "/workspace",
+
+  "mounts": [
+    "source=triage-scratch,target=/home/vscode/triage-out,type=volume"
+  ],
+
+  "containerEnv": {
+    "TRIAGE_MODE": "strict",
+    "TRIAGE_TARGET": "/workspace",
+    "TRIAGE_AUDIT_LOG": "/home/vscode/triage-out/audit.log"
+  },
+
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.12" }
+  },
+
+  "postCreateCommand": "echo 'Sandbox ready. Repo is READ-ONLY at /workspace. Review only — do not build/run/install.'"
+}

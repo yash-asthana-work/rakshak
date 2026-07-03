@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Triage runtime artifacts (never commit anything staged from an untrusted repo)
+.triage/
+triage-out/
+audit.log
+*.audit.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local settings overrides
+settings.local.json

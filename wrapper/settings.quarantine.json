@@ -1,0 +1,42 @@
+{
+  "$comment": "Claude Code QUARANTINE profile for untrusted-code triage. Enforcement layer 1+2. Point Claude Code at this via --settings, or copy into the throwaway workspace's .claude/settings.json. The guard hook path is a PLACEHOLDER — the launcher rewrites it to an absolute path, or edit it yourself. This is NOT a substitute for the OS sandbox (layer 0): run inside a network-isolated, read-only-mounted container/VM for a true boundary.",
+
+  "permissions": {
+    "defaultMode": "plan",
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob"
+    ],
+    "deny": [
+      "Bash",
+      "Write",
+      "Edit",
+      "MultiEdit",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
+      "Task"
+    ],
+    "additionalDirectories": []
+  },
+
+  "disableBypassPermissionsMode": true,
+
+  "enableAllProjectMcpServers": false,
+  "enabledMcpjsonServers": [],
+
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"REPLACE_WITH_ABSOLUTE_PATH/triage_guard.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

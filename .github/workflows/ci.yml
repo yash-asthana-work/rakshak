@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install test deps
+        run: python -m pip install --upgrade pip pytest
+      - name: Run tests
+        run: python -m pytest tests/ -q
+      - name: Scanner self-test (must flag the evil fixture)
+        shell: bash
+        run: |
+          out="$(python skills/untrusted-code-triage/scripts/scan_untrusted.py tests/fixtures/evil-repo)"
+          echo "$out"
+          echo "$out" | grep -q "prompt-injection" || { echo "scanner failed to flag injection"; exit 1; }
+          echo "$out" | grep -q "install-time-exec" || { echo "scanner failed to flag install hook"; exit 1; }
+
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Byte-compile Python
+        run: python -m compileall -q skills wrapper tests
+      - name: Validate quarantine settings JSON
+        run: python -c "import json; json.load(open('wrapper/settings.quarantine.json')); print('settings JSON valid')"
